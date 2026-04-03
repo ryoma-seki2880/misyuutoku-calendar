@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2年生仮進級者 単位修得試験日程</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+  :root {
+    --bg:#F5F7FA; --surface:#FFFFFF; --border:#E2E8F0; --text:#1A202C;
+    --text-sub:#718096; --shadow:0 2px 8px rgba(0,0,0,0.08);
+    --shadow-lg:0 8px 32px rgba(0,0,0,0.14); --radius:10px;
+    --today-bg:#FFFBEB; --today-border:#F59E0B;
+    --time-color:#7C3AED; --time-bg:#F5F3FF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+  header{background:#1E293B;color:#F8FAFC;padding:18px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,0.25);}
+  header .logo{font-size:11px;font-weight:500;color:#94A3B8;letter-spacing:.06em;line-height:1.5;}
+  header h1{font-size:16px;font-weight:700;letter-spacing:.02em;line-height:1.4;flex:1;}
+  header .subtitle{font-size:11px;color:#94A3B8;font-weight:400;}
+  .badge-rule{background:#334155;border-radius:20px;padding:4px 10px;font-size:11px;color:#CBD5E1;white-space:nowrap;}
+
+  .controls{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+  .view-tabs{display:flex;background:var(--bg);border-radius:8px;padding:3px;gap:2px;}
+  .view-tab{padding:6px 14px;border:none;background:transparent;border-radius:6px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;color:var(--text-sub);transition:all .15s;}
+  .view-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1);}
+  .filter-label{font-size:12px;font-weight:600;color:var(--text-sub);white-space:nowrap;}
+  .student-filters{display:flex;gap:6px;flex-wrap:wrap;}
+  .student-btn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:2px solid transparent;font-size:12px;font-family:inherit;font-weight:500;cursor:pointer;transition:all .15s;background:var(--bg);color:var(--text-sub);}
+  .student-btn .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .student-btn.active{color:var(--text);background:var(--surface);}
+  .student-btn:hover{opacity:.8;}
+
+  .main{max-width:1100px;margin:0 auto;padding:20px 16px;}
+
+  /* ─── Calendar ─── */
+  .calendar-wrap{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .cal-header{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 20px;border-bottom:1px solid var(--border);background:#F8FAFC;}
+  .cal-month{font-size:18px;font-weight:700;}
+  .cal-year{font-size:14px;color:var(--text-sub);}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+  .cal-dow{text-align:center;font-size:11px;font-weight:700;letter-spacing:.08em;padding:8px 4px;border-bottom:1px solid var(--border);color:var(--text-sub);}
+  .cal-dow:nth-child(6){color:#3B82F6;}
+  .cal-dow:nth-child(7){color:#EF4444;}
+  .cal-day{min-height:90px;padding:6px 5px 5px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);transition:background .1s;}
+  .cal-day:hover{background:#FAFBFC;}
+  .cal-day.empty{background:#FAFAFA;}
+  .cal-day.today{background:var(--today-bg);border-top:2px solid var(--today-border);}
+  .cal-day.sat .day-num{color:#3B82F6;}
+  .cal-day.sun .day-num{color:#EF4444;}
+  .day-num{font-size:12px;font-weight:700;font-family:'DM Mono',monospace;margin-bottom:4px;line-height:1;}
+  .today .day-num{background:var(--today-border);color:white;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;}
+  .events{display:flex;flex-direction:column;gap:2px;}
+
+  /* チップ */
+  .ev-chip{border-radius:4px;padding:2px 5px;font-size:10px;font-weight:500;line-height:1.4;cursor:pointer;transition:opacity .1s,transform .1s;overflow:hidden;}
+  .ev-chip:hover{opacity:.8;transform:translateX(1px);}
+  .ev-chip.shugyo{border-left:3px solid;}
+  .ev-chip-row{display:flex;align-items:center;gap:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ev-chip-icon{flex-shrink:0;font-size:9px;}
+  /* 時間表示（チップ内の小さいバッジ） */
+  .chip-time{
+    display:inline-flex;align-items:center;gap:2px;
+    font-size:9px;font-weight:600;
+    background:rgba(124,58,237,0.12);color:var(--time-color);
+    border-radius:3px;padding:0 3px;margin-top:1px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+  }
+  .dup-tag{font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;background:#FEF3C7;color:#D97706;border:1px solid #FDE68A;margin-left:2px;flex-shrink:0;}
+
+  /* ─── List ─── */
+  .list-view{display:none;}
+  .student-card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;}
+  .student-card-header{padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+  .student-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0;}
+  .student-info{flex:1;}
+  .student-name{font-size:15px;font-weight:700;}
+  .student-id{font-size:11px;color:var(--text-sub);font-family:'DM Mono',monospace;}
+  .student-subject-count{font-size:11px;font-weight:500;color:var(--text-sub);background:var(--bg);padding:3px 10px;border-radius:20px;}
+  .subject-rows{padding:0 20px 16px;}
+  .subject-row{padding:12px 0;border-bottom:1px solid var(--border);}
+  .subject-row:last-child{border-bottom:none;}
+  .subject-name{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  .subject-name::before{content:'';display:inline-block;width:3px;height:14px;border-radius:2px;background:currentColor;}
+  .schedule-row{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start;}
+  .arrow{color:var(--text-sub);font-size:12px;margin-top:5px;}
+
+  /* 日付ピル */
+  .date-pill{
+    display:inline-flex;flex-direction:column;align-items:flex-start;
+    padding:4px 10px;border-radius:8px;font-size:11px;font-weight:500;
+    font-family:'DM Mono',monospace;
+  }
+  .date-pill.shugyo{background:var(--bg);border:1px solid var(--border);}
+  .date-pill.shiken{color:white;font-weight:700;border-radius:20px;flex-direction:row;align-items:center;padding:4px 12px;}
+  .pill-top{display:flex;align-items:center;gap:4px;white-space:nowrap;}
+  /* 時間行（ピル内） */
+  .pill-time{
+    font-size:10px;font-weight:600;color:var(--time-color);
+    background:var(--time-bg);border-radius:3px;padding:1px 5px;
+    margin-top:3px;white-space:nowrap;
+  }
+  .pill-dur{font-size:9px;font-weight:600;margin-top:2px;}
+
+  /* ─── Modal ─── */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border-radius:14px;box-shadow:var(--shadow-lg);max-width:460px;width:calc(100% - 32px);overflow:hidden;animation:popIn .2s ease;}
+  @keyframes popIn{from{transform:scale(.92);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .modal-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .modal-date{font-size:15px;font-weight:700;}
+  .modal-close{background:var(--bg);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+  .modal-body{padding:16px 20px;max-height:60vh;overflow-y:auto;}
+  .modal-ev-group{margin-bottom:14px;}
+  .modal-ev-type{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--text-sub);margin-bottom:6px;}
+  .modal-ev-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:5px;border-left:4px solid;}
+  .modal-ev-content{flex:1;}
+  .modal-ev-student{font-size:12px;font-weight:700;}
+  .modal-ev-subject{font-size:11px;color:var(--text-sub);margin-top:1px;}
+  .modal-ev-time{
+    display:inline-flex;align-items:center;gap:4px;margin-top:5px;
+    font-size:11px;font-weight:700;color:var(--time-color);
+    background:var(--time-bg);border-radius:5px;padding:2px 8px;
+  }
+  .modal-ev-dur{font-size:10px;font-weight:600;margin-top:3px;}
+  .modal-ev-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;color:white;flex-shrink:0;}
+  .dup-note{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:#FEF3C7;color:#D97706;border:1px solid #FDE68A;margin-left:4px;}
+
+  /* ─── Legend ─── */
+  .legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding:10px 0 4px;font-size:11px;color:var(--text-sub);}
+  .legend-item{display:flex;align-items:center;gap:5px;}
+  .legend-dot{width:10px;height:10px;border-radius:2px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">スポーツ健康医療専門学校 / 柔整科</div>
+    <h1>2年生仮進級者 単位修得試験日程<br><span class="subtitle">2026年4月</span></h1>
+  </div>
+  <div class="badge-rule">📋 試験料金：1科目 2,000円</div>
+</header>
+
+<div class="controls">
+  <div class="view-tabs">
+    <button class="view-tab active" onclick="setView('calendar')">📅 カレンダー</button>
+    <button class="view-tab" onclick="setView('list')">👤 学生別一覧</button>
+  </div>
+  <span class="filter-label">絞り込み：</span>
+  <div class="student-filters" id="studentFilters"></div>
+</div>
+
+<div class="main">
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#CBD5E1;border-left:3px solid #64748B;"></div> 補習日</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#DC2626;"></div> 試験日</div>
+    <div class="legend-item"><span style="font-size:10px;background:#F5F3FF;color:#7C3AED;padding:1px 5px;border-radius:3px;font-weight:700;">⏰ 時間指定あり</span></div>
+    <div class="legend-item"><span style="font-size:10px;background:#FEF3C7;color:#D97706;padding:1px 5px;border-radius:3px;font-weight:700;">2件</span> 同日同科目×2</div>
+    <div class="legend-item" style="color:#F59E0B;">⚠ 太枠 = 今日（4/3）</div>
+  </div>
+
+  <div id="calendarView" style="margin-top:10px;">
+    <div class="calendar-wrap">
+      <div class="cal-header">
+        <span class="cal-month">4月</span><span class="cal-year">2026年</span>
+      </div>
+      <div class="cal-grid">
+        <div class="cal-dow">月</div><div class="cal-dow">火</div><div class="cal-dow">水</div>
+        <div class="cal-dow">木</div><div class="cal-dow">金</div><div class="cal-dow">土</div><div class="cal-dow">日</div>
+      </div>
+      <div class="cal-grid" id="calBody"></div>
+    </div>
+  </div>
+
+  <div id="listView" class="list-view" style="margin-top:10px;">
+    <div id="listBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-date" id="modalDate"></span>
+      <button class="modal-close" onclick="closeModal(null)">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+/* ─── 学生マスタ ─── */
+const STUDENTS = [
+  {id:'JA2512',name:'新保慶次郎',short:'新保',color:'#3B82F6',light:'#EFF6FF'},
+  {id:'JA2432',name:'野沢柚果',  short:'野沢',color:'#EC4899',light:'#FDF2F8'},
+  {id:'JH2506',name:'山﨑瑠唯',  short:'山﨑',color:'#10B981',light:'#ECFDF5'},
+  {id:'JA2533',name:'竹内想奈',  short:'竹内',color:'#F59E0B',light:'#FFFBEB'},
+  {id:'JA2536',name:'西川立翼',  short:'西川',color:'#8B5CF6',light:'#F5F3FF'},
+  {id:'JH2504',name:'綱慧音',    short:'綱',  color:'#06B6D4',light:'#ECFEFF'},
+  {id:'JA2527',name:'米須鉄生',  short:'米須',color:'#EF4444',light:'#FEF2F2'},
+  {id:'JA2528',name:'佐藤克己',  short:'佐藤',color:'#78716C',light:'#F5F5F4'},
+];
+const SM={};
+STUDENTS.forEach(s=>SM[s.id]=s);
+
+/* ─── RAWデータ（1行=1補習エントリ、time=''は時間指定なし） ─── */
+const RAW = [
+  {sid:'JA2512',subject:'骨折理論Ⅰ',day:'2026-04-06',exam:'2026-04-17',time:''},
+  {sid:'JA2432',subject:'総論Ⅰ',    day:'2026-04-06',exam:'2026-04-10',time:''},
+  {sid:'JA2432',subject:'総論Ⅱ',    day:'2026-04-06',exam:'2026-04-10',time:''},
+  {sid:'JH2506',subject:'脱臼理論Ⅰ',day:'2026-04-06',exam:'2026-04-10',time:''},
+  {sid:'JA2533',subject:'衛生学Ⅰ',  day:'2026-04-06',exam:'2026-04-17',time:''},
+  {sid:'JA2533',subject:'解剖学Ⅰ',  day:'2026-04-06',exam:'2026-04-17',time:''},
+  {sid:'JA2536',subject:'総論Ⅰ',    day:'2026-04-06',exam:'2026-04-10',time:''},
+  {sid:'JH2504',subject:'基礎実技Ⅱ',day:'2026-04-06',exam:'2026-04-10',time:''},
+  {sid:'JA2527',subject:'衛生学Ⅰ',  day:'2026-04-06',exam:'2026-04-10',time:'10：00～11：30'},
+  {sid:'JA2432',subject:'総論Ⅰ',    day:'2026-04-07',exam:'2026-04-10',time:''},
+  {sid:'JA2432',subject:'総論Ⅱ',    day:'2026-04-07',exam:'2026-04-10',time:''},
+  {sid:'JH2506',subject:'脱臼理論Ⅰ',day:'2026-04-07',exam:'2026-04-10',time:''},
+  {sid:'JA2533',subject:'衛生学Ⅰ',  day:'2026-04-07',exam:'2026-04-17',time:''},
+  {sid:'JA2533',subject:'解剖学Ⅰ',  day:'2026-04-07',exam:'2026-04-17',time:''},
+  {sid:'JA2536',subject:'総論Ⅰ',    day:'2026-04-07',exam:'2026-04-10',time:''},
+  {sid:'JH2504',subject:'基礎実技Ⅱ',day:'2026-04-07',exam:'2026-04-10',time:''},
+  {sid:'JA2527',subject:'衛生学Ⅰ',  day:'2026-04-07',exam:'2026-04-10',time:'16：20～17：50'},
+  {sid:'JA2512',subject:'骨折理論Ⅰ',day:'2026-04-08',exam:'2026-04-17',time:''},
+  {sid:'JA2432',subject:'総論Ⅰ',    day:'2026-04-08',exam:'2026-04-10',time:''},
+  {sid:'JA2432',subject:'総論Ⅱ',    day:'2026-04-08',exam:'2026-04-10',time:''},
+  {sid:'JH2506',subject:'脱臼理論Ⅰ',day:'2026-04-08',exam:'2026-04-10',time:''},
+  {sid:'JA2536',subject:'総論Ⅰ',    day:'2026-04-08',exam:'2026-04-10',time:''},
+  {sid:'JH2504',subject:'基礎実技Ⅱ',day:'2026-04-08',exam:'2026-04-10',time:''},
+  {sid:'JA2527',subject:'衛生学Ⅰ',  day:'2026-04-08',exam:'2026-04-10',time:'16：20～17：50'},
+  {sid:'JA2512',subject:'骨折理論Ⅰ',day:'2026-04-09',exam:'2026-04-17',time:''},
+  {sid:'JA2432',subject:'総論Ⅰ',    day:'2026-04-09',exam:'2026-04-10',time:''},
+  {sid:'JA2432',subject:'総論Ⅱ',    day:'2026-04-09',exam:'2026-04-10',time:''},
+  {sid:'JH2506',subject:'脱臼理論Ⅰ',day:'2026-04-09',exam:'2026-04-10',time:''},
+  {sid:'JA2533',subject:'衛生学Ⅰ',  day:'2026-04-09',exam:'2026-04-17',time:''},
+  {sid:'JA2533',subject:'解剖学Ⅰ',  day:'2026-04-09',exam:'2026-04-17',time:''},
+  {sid:'JA2536',subject:'総論Ⅰ',    day:'2026-04-09',exam:'2026-04-10',time:''},
+  {sid:'JH2504',subject:'基礎実技Ⅱ',day:'2026-04-09',exam:'2026-04-10',time:''},
+  {sid:'JA2527',subject:'衛生学Ⅰ',  day:'2026-04-09',exam:'2026-04-10',time:'10：00～11：30'},
+  {sid:'JA2512',subject:'骨折理論Ⅰ',day:'2026-04-13',exam:'2026-04-17',time:''},
+  {sid:'JA2432',subject:'衛生学Ⅰ',  day:'2026-04-13',exam:'2026-04-17',time:''},
+  {sid:'JA2432',subject:'脱臼理論Ⅰ',day:'2026-04-13',exam:'2026-04-17',time:''},
+  {sid:'JH2506',subject:'基礎実技Ⅱ',day:'2026-04-13',exam:'2026-04-17',time:''},
+  {sid:'JH2506',subject:'骨折理論Ⅱ',day:'2026-04-13',exam:'2026-04-17',time:''},
+  {sid:'JA2536',subject:'軟損理論Ⅰ',day:'2026-04-13',exam:'2026-04-17',time:''},
+  {sid:'JH2504',subject:'軟損理論Ⅰ',day:'2026-04-13',exam:'2026-04-17',time:'11：00～12：30'},
+  {sid:'JA2527',subject:'骨折理論Ⅱ',day:'2026-04-13',exam:'2026-04-17',time:'10：00～11：30'},
+  {sid:'JA2528',subject:'骨折実技Ⅰ',day:'2026-04-13',exam:'2026-04-17',time:''},
+  {sid:'JA2432',subject:'衛生学Ⅰ',  day:'2026-04-14',exam:'2026-04-17',time:''},
+  {sid:'JA2432',subject:'脱臼理論Ⅰ',day:'2026-04-14',exam:'2026-04-17',time:''},
+  {sid:'JH2506',subject:'基礎実技Ⅱ',day:'2026-04-14',exam:'2026-04-17',time:''},
+  {sid:'JH2506',subject:'骨折理論Ⅱ',day:'2026-04-14',exam:'2026-04-17',time:''},
+  {sid:'JA2533',subject:'衛生学Ⅰ',  day:'2026-04-14',exam:'2026-04-17',time:''},
+  {sid:'JA2533',subject:'解剖学Ⅰ',  day:'2026-04-14',exam:'2026-04-17',time:''},
+  {sid:'JA2536',subject:'軟損理論Ⅰ',day:'2026-04-14',exam:'2026-04-17',time:''},
+  {sid:'JH2504',subject:'軟損理論Ⅰ',day:'2026-04-14',exam:'2026-04-17',time:''},
+  {sid:'JA2527',subject:'骨折理論Ⅱ',day:'2026-04-14',exam:'2026-04-17',time:'10：00～11：30'},
+  {sid:'JA2528',subject:'骨折実技Ⅰ',day:'2026-04-14',exam:'2026-04-17',time:''},
+  {sid:'JA2432',subject:'衛生学Ⅰ',  day:'2026-04-15',exam:'2026-04-17',time:''},
+  {sid:'JA2432',subject:'脱臼理論Ⅰ',day:'2026-04-15',exam:'2026-04-17',time:''},
+  {sid:'JH2506',subject:'基礎実技Ⅱ',day:'2026-04-15',exam:'2026-04-17',time:''},
+  {sid:'JH2506',subject:'骨折理論Ⅱ',day:'2026-04-15',exam:'2026-04-17',time:''},
+  {sid:'JA2536',subject:'軟損理論Ⅰ',day:'2026-04-15',exam:'2026-04-17',time:''},
+  {sid:'JH2504',subject:'軟損理論Ⅰ',day:'2026-04-15',exam:'2026-04-17',time:''},
+  {sid:'JA2527',subject:'骨折理論Ⅱ',day:'2026-04-15',exam:'2026-04-17',time:'10：00～11：30'},
+  {sid:'JA2528',subject:'骨折実技Ⅰ',day:'2026-04-15',exam:'2026-04-17',time:''},
+  {sid:'JA2432',subject:'衛生学Ⅰ',  day:'2026-04-16',exam:'2026-04-17',time:''},
+  {sid:'JA2432',subject:'脱臼理論Ⅰ',day:'2026-04-16',exam:'2026-04-17',time:''},
+  {sid:'JH2506',subject:'基礎実技Ⅱ',day:'2026-04-16',exam:'2026-04-17',time:''},
+  {sid:'JH2506',subject:'骨折理論Ⅱ',day:'2026-04-16',exam:'2026-04-17',time:''},
+  {sid:'JA2536',subject:'軟損理論Ⅰ',day:'2026-04-16',exam:'2026-04-17',time:''},
+  {sid:'JH2504',subject:'軟損理論Ⅰ',day:'2026-04-16',exam:'2026-04-17',time:''},
+  {sid:'JA2527',subject:'骨折理論Ⅱ',day:'2026-04-16',exam:'2026-04-17',time:'10：00～11：30'},
+  {sid:'JA2528',subject:'骨折実技Ⅰ',day:'2026-04-16',exam:'2026-04-17',time:''},
+  {sid:'JA2512',subject:'軟損理論Ⅰ',day:'2026-04-20',exam:'2026-04-24',time:''},
+  {sid:'JA2432',subject:'骨折理論Ⅱ',day:'2026-04-20',exam:'2026-04-24',time:''},
+  {sid:'JA2432',subject:'軟損理論Ⅰ',day:'2026-04-20',exam:'2026-04-24',time:''},
+  {sid:'JH2506',subject:'軟損理論Ⅰ',day:'2026-04-20',exam:'2026-04-24',time:''},
+  {sid:'JA2536',subject:'基礎実技Ⅱ',day:'2026-04-20',exam:'2026-04-24',time:''},
+  {sid:'JH2504',subject:'脱臼理論Ⅰ',day:'2026-04-20',exam:'2026-04-24',time:''},
+  {sid:'JA2527',subject:'脱臼理論Ⅰ',day:'2026-04-20',exam:'2026-04-24',time:'10：00～11：30'},
+  {sid:'JA2528',subject:'軟損理論Ⅰ',day:'2026-04-20',exam:'2026-04-24',time:''},
+  {sid:'JA2512',subject:'軟損理論Ⅰ',day:'2026-04-21',exam:'2026-04-24',time:''},
+  {sid:'JA2432',subject:'骨折理論Ⅱ',day:'2026-04-21',exam:'2026-04-24',time:''},
+  {sid:'JA2432',subject:'軟損理論Ⅰ',day:'2026-04-21',exam:'2026-04-24',time:''},
+  {sid:'JH2506',subject:'軟損理論Ⅰ',day:'2026-04-21',exam:'2026-04-24',time:''},
+  {sid:'JA2533',subject:'総論Ⅰ',    day:'2026-04-21',exam:'2026-04-24',time:''},
+  {sid:'JA2533',subject:'総論Ⅰ',    day:'2026-04-21',exam:'2026-04-24',time:''},  // 重複
+  {sid:'JA2536',subject:'基礎実技Ⅱ',day:'2026-04-21',exam:'2026-04-24',time:''},
+  {sid:'JH2504',subject:'脱臼理論Ⅰ',day:'2026-04-21',exam:'2026-04-24',time:''},
+  {sid:'JA2527',subject:'脱臼理論Ⅰ',day:'2026-04-21',exam:'2026-04-24',time:'16：20～17：50'},
+  {sid:'JA2528',subject:'軟損理論Ⅰ',day:'2026-04-21',exam:'2026-04-24',time:''},
+  {sid:'JA2512',subject:'軟損理論Ⅰ',day:'2026-04-22',exam:'2026-04-24',time:''},
+  {sid:'JA2432',subject:'骨折理論Ⅱ',day:'2026-04-22',exam:'2026-04-24',time:''},
+  {sid:'JA2432',subject:'軟損理論Ⅰ',day:'2026-04-22',exam:'2026-04-24',time:''},
+  {sid:'JH2506',subject:'軟損理論Ⅰ',day:'2026-04-22',exam:'2026-04-24',time:''},
+  {sid:'JA2536',subject:'基礎実技Ⅱ',day:'2026-04-22',exam:'2026-04-24',time:''},
+  {sid:'JH2504',subject:'脱臼理論Ⅰ',day:'2026-04-22',exam:'2026-04-24',time:''},
+  {sid:'JA2527',subject:'脱臼理論Ⅰ',day:'2026-04-22',exam:'2026-04-24',time:'16：20～17：50'},
+  {sid:'JA2528',subject:'軟損理論Ⅰ',day:'2026-04-22',exam:'2026-04-24',time:''},
+  {sid:'JA2512',subject:'軟損理論Ⅰ',day:'2026-04-23',exam:'2026-04-24',time:''},
+  {sid:'JA2432',subject:'骨折理論Ⅱ',day:'2026-04-23',exam:'2026-04-24',time:''},
+  {sid:'JA2432',subject:'軟損理論Ⅰ',day:'2026-04-23',exam:'2026-04-24',time:''},
+  {sid:'JH2506',subject:'軟損理論Ⅰ',day:'2026-04-23',exam:'2026-04-24',time:''},
+  {sid:'JA2533',subject:'総論Ⅰ',    day:'2026-04-23',exam:'2026-04-24',time:''},
+  {sid:'JA2533',subject:'総論Ⅰ',    day:'2026-04-23',exam:'2026-04-24',time:''},  // 重複
+  {sid:'JA2536',subject:'基礎実技Ⅱ',day:'2026-04-23',exam:'2026-04-24',time:''},
+  {sid:'JH2504',subject:'脱臼理論Ⅰ',day:'2026-04-23',exam:'2026-04-24',time:''},
+  {sid:'JA2527',subject:'脱臼理論Ⅰ',day:'2026-04-23',exam:'2026-04-24',time:'16：20～17：50'},
+  {sid:'JA2528',subject:'軟損理論Ⅰ',day:'2026-04-23',exam:'2026-04-24',time:''},
+];
+
+/* ─── 所要時間マップ ─── */
+const DUR={};
+RAW.forEach(r=>{const k=`${r.sid}_${r.day}`;DUR[k]=(DUR[k]||0)+90;});
+function getDur(sid,day){return DUR[`${sid}_${day}`]||90;}
+function durLabel(min){return min===90?'90分':`${min}分（${min/90}コマ）`;}
+
+const DOW=['日','月','火','水','木','金','土'];
+function fmtDate(d){
+  const[,m,dd]=d.split('-');
+  return `${+m}/${+dd}(${DOW[new Date(d).getDay()]})`;
+}
+
+let activeStudent='all', currentView='calendar';
+
+/* ─── イベントマップ構築 ─── */
+function buildMaps(filt){
+  // 補習: 重複ありのまま全件、timeも保持
+  const shugyo={}, shikenSeen=new Set(), shiken={};
+  RAW.forEach(r=>{
+    if(filt!=='all'&&r.sid!==filt) return;
+    if(!shugyo[r.day]) shugyo[r.day]=[];
+    shugyo[r.day].push({sid:r.sid,subject:r.subject,time:r.time});
+    const sk=`${r.sid}_${r.subject}_${r.exam}`;
+    if(!shikenSeen.has(sk)){
+      shikenSeen.add(sk);
+      if(!shiken[r.exam]) shiken[r.exam]=[];
+      shiken[r.exam].push({sid:r.sid,subject:r.subject});
+    }
+  });
+  return{shugyo,shiken};
+}
+
+/* ─── カレンダー描画 ─── */
+function renderCalendar(){
+  const{shugyo,shiken}=buildMaps(activeStudent);
+  const calBody=document.getElementById('calBody');
+  calBody.innerHTML='';
+  const today='2026-04-03';
+
+  for(let i=0;i<2;i++){const el=document.createElement('div');el.className='cal-day empty';calBody.appendChild(el);}
+
+  for(let d=1;d<=30;d++){
+    const ds=`2026-04-${String(d).padStart(2,'0')}`;
+    const dow=(2+d-1)%7;
+    const cell=document.createElement('div');
+    cell.className=`cal-day${dow===5?' sat':''}${dow===6?' sun':''}${ds===today?' today':''}`;
+    const num=document.createElement('div');num.className='day-num';num.textContent=d;cell.appendChild(num);
+
+    const dayS=shugyo[ds]||[], dayK=shiken[ds]||[];
+    if(dayS.length||dayK.length){
+      const ev=document.createElement('div');ev.className='events';
+
+      // 試験チップ
+      dayK.forEach(e=>{
+        const stu=SM[e.sid];
+        const chip=document.createElement('div');chip.className='ev-chip shiken';
+        chip.style.cssText=`background:${stu.color};color:white;`;
+        chip.innerHTML=`<div class="ev-chip-row"><span class="ev-chip-icon">🎯</span>${stu.short}・${e.subject}</div>`;
+        chip.onclick=ev2=>{ev2.stopPropagation();openModal(ds,dayS,dayK);};
+        ev.appendChild(chip);
+      });
+
+      // 補習チップ（重複は全件表示・timeがあればバッジ）
+      const cnt={};
+      dayS.forEach(e=>{const k=`${e.sid}_${e.subject}`;cnt[k]=(cnt[k]||0)+1;});
+      const addIdx={};
+      dayS.forEach(e=>{
+        const stu=SM[e.sid];
+        const k=`${e.sid}_${e.subject}`;
+        const isDup=cnt[k]>1;
+        const idx=addIdx[k]||0;addIdx[k]=idx+1;
+
+        const chip=document.createElement('div');chip.className='ev-chip shugyo';
+        chip.style.cssText=`background:${stu.light};border-left-color:${stu.color};color:${stu.color};`;
+        if(isDup&&idx>0) chip.style.opacity='0.72';
+
+        let dupHtml=isDup&&idx===0?`<span class="dup-tag">2件</span>`:'';
+        let timeHtml=e.time?`<div class="chip-time">⏰${e.time}</div>`:'';
+
+        chip.innerHTML=`<div class="ev-chip-row"><span class="ev-chip-icon">✏</span>${stu.short}・${e.subject}${dupHtml}</div>${timeHtml}`;
+        chip.onclick=ev2=>{ev2.stopPropagation();openModal(ds,dayS,dayK);};
+        ev.appendChild(chip);
+      });
+
+      cell.appendChild(ev);
+    }
+    calBody.appendChild(cell);
+  }
+
+  const rem=(2+30)%7;
+  if(rem){for(let i=0;i<7-rem;i++){const el=document.createElement('div');el.className='cal-day empty';calBody.appendChild(el);}}
+}
+
+/* ─── 学生別一覧 ─── */
+function renderList(){
+  const lb=document.getElementById('listBody');lb.innerHTML='';
+  const list=activeStudent==='all'?STUDENTS:STUDENTS.filter(s=>s.id===activeStudent);
+
+  list.forEach(stu=>{
+    const rows=RAW.filter(r=>r.sid===stu.id);
+    if(!rows.length) return;
+
+    // (subject,exam)でグループ化
+    const groups={};
+    rows.forEach(r=>{
+      const k=`${r.subject}||${r.exam}`;
+      if(!groups[k]) groups[k]={subject:r.subject,exam:r.exam,entries:[]};
+      groups[k].entries.push({day:r.day,time:r.time});
+    });
+    const gl=Object.values(groups);
+
+    const card=document.createElement('div');card.className='student-card';
+    card.innerHTML=`
+      <div class="student-card-header">
+        <div class="student-avatar" style="background:${stu.color}">${stu.short[0]}</div>
+        <div class="student-info">
+          <div class="student-name">${stu.name}</div>
+          <div class="student-id">${stu.id}</div>
+        </div>
+        <div class="student-subject-count">${gl.length}科目</div>
+      </div>
+      <div class="subject-rows" id="rows-${stu.id}"></div>`;
+    lb.appendChild(card);
+
+    const rowsEl=document.getElementById(`rows-${stu.id}`);
+    gl.forEach(g=>{
+      // 同日エントリをday→{count,time[]}にまとめる
+      const dayMap={};
+      g.entries.forEach(e=>{
+        if(!dayMap[e.day]) dayMap[e.day]={count:0,times:[]};
+        dayMap[e.day].count++;
+        if(e.time) dayMap[e.day].times.push(e.time);
+      });
+      const udays=Object.keys(dayMap).sort();
+
+      const pills=udays.map(d=>{
+        const dm=dayMap[d];
+        const min=getDur(stu.id,d);
+        const mc=min>90?'#D97706':'#6B7280';
+        const dupBadge=dm.count>1?`<span style="background:#FEF3C7;color:#D97706;font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;margin-left:2px;">×${dm.count}</span>`:'';
+        // timeは重複があっても同じなので最初の1件だけ表示
+        const t=[...new Set(dm.times)][0]||'';
+        const timeEl=t?`<div class="pill-time">⏰ ${t}</div>`:'';
+        const durEl=`<div class="pill-dur" style="color:${mc}">⏱ ${durLabel(min)}</div>`;
+        return `<span class="date-pill shugyo" style="border:1px solid ${stu.color}40;"><div class="pill-top">✏ ${fmtDate(d)}${dupBadge}</div>${timeEl}${durEl}</span>`;
+      }).join('');
+
+      const examPill=`<span class="date-pill shiken" style="background:${stu.color}">🎯 ${fmtDate(g.exam)} 試験</span>`;
+
+      const row=document.createElement('div');row.className='subject-row';
+      row.innerHTML=`
+        <div class="subject-name" style="color:${stu.color}">${g.subject}</div>
+        <div class="schedule-row">${pills}<span class="arrow">→</span>${examPill}</div>`;
+      rowsEl.appendChild(row);
+    });
+  });
+}
+
+/* ─── モーダル ─── */
+function openModal(ds,shugyoList,shikenList){
+  document.getElementById('modalDate').textContent=`${fmtDate(ds).replace('(','\uff08').replace(')','\uff09')}のスケジュール`;
+  const body=document.getElementById('modalBody');body.innerHTML='';
+
+  if(shikenList.length){
+    const g=document.createElement('div');g.className='modal-ev-group';
+    g.innerHTML=`<div class="modal-ev-type">🎯 試験</div>`;
+    shikenList.forEach(e=>{
+      const stu=SM[e.sid];
+      const item=document.createElement('div');item.className='modal-ev-item shiken';
+      item.style.cssText=`border-left-color:${stu.color};background:${stu.light};`;
+      item.innerHTML=`<div class="modal-ev-content"><div class="modal-ev-student">${stu.name}</div><div class="modal-ev-subject">${e.subject}</div></div><div class="modal-ev-badge" style="background:${stu.color}">試験</div>`;
+      g.appendChild(item);
+    });
+    body.appendChild(g);
+  }
+
+  if(shugyoList.length){
+    const g=document.createElement('div');g.className='modal-ev-group';
+    g.innerHTML=`<div class="modal-ev-type">✏ 補習（課題提出）</div>`;
+
+    // sid+subjectごとに集約（count・time保持）
+    const agg={};
+    shugyoList.forEach(e=>{
+      const k=`${e.sid}_${e.subject}`;
+      if(!agg[k]) agg[k]={sid:e.sid,subject:e.subject,count:0,times:[]};
+      agg[k].count++;
+      if(e.time) agg[k].times.push(e.time);
+    });
+
+    Object.values(agg).forEach(a=>{
+      const stu=SM[a.sid];
+      const min=getDur(a.sid,ds);
+      const mc=min>90?'#D97706':'#6B7280';
+      const dupNote=a.count>1?`<span class="dup-note">×${a.count}件（同科目）</span>`:'';
+      // 同一科目のtimeは同じ値なので最初の1件
+      const t=[...new Set(a.times)][0]||'';
+      const timeEl=t?`<div class="modal-ev-time">⏰ ${t}</div>`:'';
+      const item=document.createElement('div');item.className='modal-ev-item shugyo';
+      item.style.cssText=`border-left-color:${stu.color};background:${stu.light};`;
+      item.innerHTML=`
+        <div class="modal-ev-content">
+          <div class="modal-ev-student">${stu.name}${dupNote}</div>
+          <div class="modal-ev-subject">${a.subject}</div>
+          ${timeEl}
+          <div class="modal-ev-dur" style="color:${mc}">⏱ ${durLabel(min)}</div>
+        </div>
+        <div class="modal-ev-badge" style="background:${stu.color}">補習</div>`;
+      g.appendChild(item);
+    });
+    body.appendChild(g);
+  }
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e){
+  if(e&&e.target!==document.getElementById('modalOverlay')) return;
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+/* ─── フィルター・ビュー切替 ─── */
+function buildFilters(){
+  const c=document.getElementById('studentFilters');c.innerHTML='';
+  const ab=document.createElement('button');
+  ab.className=`student-btn ${activeStudent==='all'?'active':''}`;
+  ab.style.borderColor=activeStudent==='all'?'#334155':'transparent';
+  ab.innerHTML=`<span class="dot" style="background:#334155"></span>全員`;
+  ab.onclick=()=>{activeStudent='all';refresh();};
+  c.appendChild(ab);
+  STUDENTS.forEach(stu=>{
+    if(!RAW.some(r=>r.sid===stu.id)) return;
+    const btn=document.createElement('button');
+    btn.className=`student-btn ${activeStudent===stu.id?'active':''}`;
+    btn.style.borderColor=activeStudent===stu.id?stu.color:'transparent';
+    btn.innerHTML=`<span class="dot" style="background:${stu.color}"></span>${stu.name}`;
+    btn.onclick=()=>{activeStudent=stu.id;refresh();};
+    c.appendChild(btn);
+  });
+}
+function setView(v){
+  currentView=v;
+  document.querySelectorAll('.view-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&v==='calendar')||(i===1&&v==='list')));
+  document.getElementById('calendarView').style.display=v==='calendar'?'block':'none';
+  document.getElementById('listView').style.display=v==='list'?'block':'none';
+  render();
+}
+function refresh(){buildFilters();render();}
+function render(){currentView==='calendar'?renderCalendar():renderList();}
+
+buildFilters();
+renderCalendar();
+</script>
+</body>
+</html>
