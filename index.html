@@ -54,20 +54,12 @@
   .today .day-num{background:var(--today-border);color:white;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;}
   .events{display:flex;flex-direction:column;gap:2px;}
 
-  /* チップ */
-  .ev-chip{border-radius:4px;padding:2px 5px;font-size:10px;font-weight:500;line-height:1.4;cursor:pointer;transition:opacity .1s,transform .1s;overflow:hidden;}
+  .ev-chip{border-radius:4px;padding:2px 5px;font-size:10px;font-weight:500;line-height:1.4;cursor:pointer;overflow:hidden;transition:opacity .1s,transform .1s;}
   .ev-chip:hover{opacity:.8;transform:translateX(1px);}
   .ev-chip.shugyo{border-left:3px solid;}
   .ev-chip-row{display:flex;align-items:center;gap:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .ev-chip-icon{flex-shrink:0;font-size:9px;}
-  /* 時間表示（チップ内の小さいバッジ） */
-  .chip-time{
-    display:inline-flex;align-items:center;gap:2px;
-    font-size:9px;font-weight:600;
-    background:rgba(124,58,237,0.12);color:var(--time-color);
-    border-radius:3px;padding:0 3px;margin-top:1px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
-  }
+  .chip-time{display:inline-flex;align-items:center;gap:2px;font-size:9px;font-weight:600;background:rgba(124,58,237,.12);color:var(--time-color);border-radius:3px;padding:0 3px;margin-top:1px;white-space:nowrap;}
   .dup-tag{font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;background:#FEF3C7;color:#D97706;border:1px solid #FDE68A;margin-left:2px;flex-shrink:0;}
 
   /* ─── List ─── */
@@ -86,22 +78,11 @@
   .subject-name::before{content:'';display:inline-block;width:3px;height:14px;border-radius:2px;background:currentColor;}
   .schedule-row{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start;}
   .arrow{color:var(--text-sub);font-size:12px;margin-top:5px;}
-
-  /* 日付ピル */
-  .date-pill{
-    display:inline-flex;flex-direction:column;align-items:flex-start;
-    padding:4px 10px;border-radius:8px;font-size:11px;font-weight:500;
-    font-family:'DM Mono',monospace;
-  }
+  .date-pill{display:inline-flex;flex-direction:column;align-items:flex-start;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:500;font-family:'DM Mono',monospace;}
   .date-pill.shugyo{background:var(--bg);border:1px solid var(--border);}
   .date-pill.shiken{color:white;font-weight:700;border-radius:20px;flex-direction:row;align-items:center;padding:4px 12px;}
   .pill-top{display:flex;align-items:center;gap:4px;white-space:nowrap;}
-  /* 時間行（ピル内） */
-  .pill-time{
-    font-size:10px;font-weight:600;color:var(--time-color);
-    background:var(--time-bg);border-radius:3px;padding:1px 5px;
-    margin-top:3px;white-space:nowrap;
-  }
+  .pill-time{font-size:10px;font-weight:600;color:var(--time-color);background:var(--time-bg);border-radius:3px;padding:1px 5px;margin-top:3px;white-space:nowrap;}
   .pill-dur{font-size:9px;font-weight:600;margin-top:2px;}
 
   /* ─── Modal ─── */
@@ -119,11 +100,7 @@
   .modal-ev-content{flex:1;}
   .modal-ev-student{font-size:12px;font-weight:700;}
   .modal-ev-subject{font-size:11px;color:var(--text-sub);margin-top:1px;}
-  .modal-ev-time{
-    display:inline-flex;align-items:center;gap:4px;margin-top:5px;
-    font-size:11px;font-weight:700;color:var(--time-color);
-    background:var(--time-bg);border-radius:5px;padding:2px 8px;
-  }
+  .modal-ev-time{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:11px;font-weight:700;color:var(--time-color);background:var(--time-bg);border-radius:5px;padding:2px 8px;}
   .modal-ev-dur{font-size:10px;font-weight:600;margin-top:3px;}
   .modal-ev-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;color:white;flex-shrink:0;}
   .dup-note{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:#FEF3C7;color:#D97706;border:1px solid #FDE68A;margin-left:4px;}
@@ -132,6 +109,9 @@
   .legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding:10px 0 4px;font-size:11px;color:var(--text-sub);}
   .legend-item{display:flex;align-items:center;gap:5px;}
   .legend-dot{width:10px;height:10px;border-radius:2px;}
+
+  /* 今日表示デバッグ用 */
+  .today-indicator{font-size:11px;color:var(--text-sub);text-align:right;padding:4px 0 0;}
 </style>
 </head>
 <body>
@@ -159,10 +139,11 @@
     <div class="legend-item"><div class="legend-dot" style="background:#DC2626;"></div> 試験日</div>
     <div class="legend-item"><span style="font-size:10px;background:#F5F3FF;color:#7C3AED;padding:1px 5px;border-radius:3px;font-weight:700;">⏰ 時間指定あり</span></div>
     <div class="legend-item"><span style="font-size:10px;background:#FEF3C7;color:#D97706;padding:1px 5px;border-radius:3px;font-weight:700;">2件</span> 同日同科目×2</div>
-    <div class="legend-item" style="color:#F59E0B;">⚠ 太枠 = 今日（4/3）</div>
+    <div class="legend-item" style="color:#F59E0B;">⚠ 太枠 = 今日</div>
   </div>
+  <div class="today-indicator" id="todayIndicator"></div>
 
-  <div id="calendarView" style="margin-top:10px;">
+  <div id="calendarView" style="margin-top:8px;">
     <div class="calendar-wrap">
       <div class="cal-header">
         <span class="cal-month">4月</span><span class="cal-year">2026年</span>
@@ -191,6 +172,17 @@
 </div>
 
 <script>
+/* ─── 今日の日付（ページ読み込み時点） ─── */
+const _now = new Date();
+const TODAY = [
+  _now.getFullYear(),
+  String(_now.getMonth() + 1).padStart(2, '0'),
+  String(_now.getDate()).padStart(2, '0')
+].join('-');
+
+// デバッグ用：今日の日付を画面に表示
+document.getElementById('todayIndicator').textContent = `今日: ${TODAY}`;
+
 /* ─── 学生マスタ ─── */
 const STUDENTS = [
   {id:'JA2512',name:'新保慶次郎',short:'新保',color:'#3B82F6',light:'#EFF6FF'},
@@ -202,10 +194,10 @@ const STUDENTS = [
   {id:'JA2527',name:'米須鉄生',  short:'米須',color:'#EF4444',light:'#FEF2F2'},
   {id:'JA2528',name:'佐藤克己',  short:'佐藤',color:'#78716C',light:'#F5F5F4'},
 ];
-const SM={};
-STUDENTS.forEach(s=>SM[s.id]=s);
+const SM = {};
+STUDENTS.forEach(s => SM[s.id] = s);
 
-/* ─── RAWデータ（1行=1補習エントリ、time=''は時間指定なし） ─── */
+/* ─── RAWデータ ─── */
 const RAW = [
   {sid:'JA2512',subject:'骨折理論Ⅰ',day:'2026-04-06',exam:'2026-04-17',time:''},
   {sid:'JA2432',subject:'総論Ⅰ',    day:'2026-04-06',exam:'2026-04-10',time:''},
@@ -288,7 +280,7 @@ const RAW = [
   {sid:'JA2432',subject:'軟損理論Ⅰ',day:'2026-04-21',exam:'2026-04-24',time:''},
   {sid:'JH2506',subject:'軟損理論Ⅰ',day:'2026-04-21',exam:'2026-04-24',time:''},
   {sid:'JA2533',subject:'総論Ⅰ',    day:'2026-04-21',exam:'2026-04-24',time:''},
-  {sid:'JA2533',subject:'総論Ⅰ',    day:'2026-04-21',exam:'2026-04-24',time:''},  // 重複
+  {sid:'JA2533',subject:'総論Ⅰ',    day:'2026-04-21',exam:'2026-04-24',time:''},
   {sid:'JA2536',subject:'基礎実技Ⅱ',day:'2026-04-21',exam:'2026-04-24',time:''},
   {sid:'JH2504',subject:'脱臼理論Ⅰ',day:'2026-04-21',exam:'2026-04-24',time:''},
   {sid:'JA2527',subject:'脱臼理論Ⅰ',day:'2026-04-21',exam:'2026-04-24',time:'16：20～17：50'},
@@ -306,94 +298,101 @@ const RAW = [
   {sid:'JA2432',subject:'軟損理論Ⅰ',day:'2026-04-23',exam:'2026-04-24',time:''},
   {sid:'JH2506',subject:'軟損理論Ⅰ',day:'2026-04-23',exam:'2026-04-24',time:''},
   {sid:'JA2533',subject:'総論Ⅰ',    day:'2026-04-23',exam:'2026-04-24',time:''},
-  {sid:'JA2533',subject:'総論Ⅰ',    day:'2026-04-23',exam:'2026-04-24',time:''},  // 重複
+  {sid:'JA2533',subject:'総論Ⅰ',    day:'2026-04-23',exam:'2026-04-24',time:''},
   {sid:'JA2536',subject:'基礎実技Ⅱ',day:'2026-04-23',exam:'2026-04-24',time:''},
   {sid:'JH2504',subject:'脱臼理論Ⅰ',day:'2026-04-23',exam:'2026-04-24',time:''},
   {sid:'JA2527',subject:'脱臼理論Ⅰ',day:'2026-04-23',exam:'2026-04-24',time:'16：20～17：50'},
   {sid:'JA2528',subject:'軟損理論Ⅰ',day:'2026-04-23',exam:'2026-04-24',time:''},
 ];
 
-/* ─── 所要時間マップ ─── */
-const DUR={};
-RAW.forEach(r=>{const k=`${r.sid}_${r.day}`;DUR[k]=(DUR[k]||0)+90;});
-function getDur(sid,day){return DUR[`${sid}_${day}`]||90;}
-function durLabel(min){return min===90?'90分':`${min}分（${min/90}コマ）`;}
+/* ─── ユーティリティ ─── */
+const DUR = {};
+RAW.forEach(r => { const k=`${r.sid}_${r.day}`; DUR[k] = (DUR[k]||0) + 90; });
+function getDur(sid, day) { return DUR[`${sid}_${day}`] || 90; }
+function durLabel(min) { return min === 90 ? '90分' : `${min}分（${min/90}コマ）`; }
+const DOW = ['日','月','火','水','木','金','土'];
+function fmtDate(d) { const[,m,dd]=d.split('-'); return `${+m}/${+dd}(${DOW[new Date(d).getDay()]})`; }
 
-const DOW=['日','月','火','水','木','金','土'];
-function fmtDate(d){
-  const[,m,dd]=d.split('-');
-  return `${+m}/${+dd}(${DOW[new Date(d).getDay()]})`;
-}
+let activeStudent = 'all', currentView = 'calendar';
 
-let activeStudent='all', currentView='calendar';
-
-/* ─── イベントマップ構築 ─── */
-function buildMaps(filt){
-  // 補習: 重複ありのまま全件、timeも保持
-  const shugyo={}, shikenSeen=new Set(), shiken={};
-  RAW.forEach(r=>{
-    if(filt!=='all'&&r.sid!==filt) return;
-    if(!shugyo[r.day]) shugyo[r.day]=[];
-    shugyo[r.day].push({sid:r.sid,subject:r.subject,time:r.time});
-    const sk=`${r.sid}_${r.subject}_${r.exam}`;
-    if(!shikenSeen.has(sk)){
+/* ─── イベントマップ ─── */
+function buildMaps(filt) {
+  const shugyo = {}, shikenSeen = new Set(), shiken = {};
+  RAW.forEach(r => {
+    if (filt !== 'all' && r.sid !== filt) return;
+    if (!shugyo[r.day]) shugyo[r.day] = [];
+    shugyo[r.day].push({sid:r.sid, subject:r.subject, time:r.time});
+    const sk = `${r.sid}_${r.subject}_${r.exam}`;
+    if (!shikenSeen.has(sk)) {
       shikenSeen.add(sk);
-      if(!shiken[r.exam]) shiken[r.exam]=[];
-      shiken[r.exam].push({sid:r.sid,subject:r.subject});
+      if (!shiken[r.exam]) shiken[r.exam] = [];
+      shiken[r.exam].push({sid:r.sid, subject:r.subject});
     }
   });
-  return{shugyo,shiken};
+  return {shugyo, shiken};
 }
 
 /* ─── カレンダー描画 ─── */
-function renderCalendar(){
-  const{shugyo,shiken}=buildMaps(activeStudent);
-  const calBody=document.getElementById('calBody');
-  calBody.innerHTML='';
-  const today='2026-04-03';
+function renderCalendar() {
+  const {shugyo, shiken} = buildMaps(activeStudent);
+  const calBody = document.getElementById('calBody');
+  calBody.innerHTML = '';
 
-  for(let i=0;i<2;i++){const el=document.createElement('div');el.className='cal-day empty';calBody.appendChild(el);}
+  // 空白マス（4/1=水曜→月曜起算で2マス）
+  for (let i = 0; i < 2; i++) {
+    const el = document.createElement('div'); el.className = 'cal-day empty'; calBody.appendChild(el);
+  }
 
-  for(let d=1;d<=30;d++){
-    const ds=`2026-04-${String(d).padStart(2,'0')}`;
-    const dow=(2+d-1)%7;
-    const cell=document.createElement('div');
-    cell.className=`cal-day${dow===5?' sat':''}${dow===6?' sun':''}${ds===today?' today':''}`;
-    const num=document.createElement('div');num.className='day-num';num.textContent=d;cell.appendChild(num);
+  for (let d = 1; d <= 30; d++) {
+    const ds = `2026-04-${String(d).padStart(2,'0')}`;
+    const dow = (2 + d - 1) % 7; // 0=月
+    const isToday = ds === TODAY;
 
-    const dayS=shugyo[ds]||[], dayK=shiken[ds]||[];
-    if(dayS.length||dayK.length){
-      const ev=document.createElement('div');ev.className='events';
+    const cell = document.createElement('div');
+    cell.className = [
+      'cal-day',
+      dow === 5 ? 'sat' : '',
+      dow === 6 ? 'sun' : '',
+      isToday   ? 'today' : '',
+    ].filter(Boolean).join(' ');
+
+    const num = document.createElement('div'); num.className = 'day-num'; num.textContent = d;
+    cell.appendChild(num);
+
+    const dayS = shugyo[ds] || [], dayK = shiken[ds] || [];
+    if (dayS.length || dayK.length) {
+      const ev = document.createElement('div'); ev.className = 'events';
 
       // 試験チップ
-      dayK.forEach(e=>{
-        const stu=SM[e.sid];
-        const chip=document.createElement('div');chip.className='ev-chip shiken';
-        chip.style.cssText=`background:${stu.color};color:white;`;
-        chip.innerHTML=`<div class="ev-chip-row"><span class="ev-chip-icon">🎯</span>${stu.short}・${e.subject}</div>`;
-        chip.onclick=ev2=>{ev2.stopPropagation();openModal(ds,dayS,dayK);};
+      dayK.forEach(e => {
+        const stu = SM[e.sid];
+        const chip = document.createElement('div');
+        chip.className = 'ev-chip shiken';
+        chip.style.cssText = `background:${stu.color};color:white;`;
+        chip.innerHTML = `<div class="ev-chip-row"><span class="ev-chip-icon">🎯</span>${stu.short}・${e.subject}</div>`;
+        chip.onclick = ev2 => { ev2.stopPropagation(); openModal(ds, dayS, dayK); };
         ev.appendChild(chip);
       });
 
-      // 補習チップ（重複は全件表示・timeがあればバッジ）
-      const cnt={};
-      dayS.forEach(e=>{const k=`${e.sid}_${e.subject}`;cnt[k]=(cnt[k]||0)+1;});
-      const addIdx={};
-      dayS.forEach(e=>{
-        const stu=SM[e.sid];
-        const k=`${e.sid}_${e.subject}`;
-        const isDup=cnt[k]>1;
-        const idx=addIdx[k]||0;addIdx[k]=idx+1;
+      // 補習チップ
+      const cnt = {};
+      dayS.forEach(e => { const k=`${e.sid}_${e.subject}`; cnt[k]=(cnt[k]||0)+1; });
+      const addIdx = {};
+      dayS.forEach(e => {
+        const stu = SM[e.sid];
+        const k = `${e.sid}_${e.subject}`;
+        const isDup = cnt[k] > 1;
+        const idx = addIdx[k] || 0; addIdx[k] = idx + 1;
 
-        const chip=document.createElement('div');chip.className='ev-chip shugyo';
-        chip.style.cssText=`background:${stu.light};border-left-color:${stu.color};color:${stu.color};`;
-        if(isDup&&idx>0) chip.style.opacity='0.72';
+        const chip = document.createElement('div');
+        chip.className = 'ev-chip shugyo';
+        chip.style.cssText = `background:${stu.light};border-left-color:${stu.color};color:${stu.color};`;
+        if (isDup && idx > 0) chip.style.opacity = '0.72';
 
-        let dupHtml=isDup&&idx===0?`<span class="dup-tag">2件</span>`:'';
-        let timeHtml=e.time?`<div class="chip-time">⏰${e.time}</div>`:'';
-
-        chip.innerHTML=`<div class="ev-chip-row"><span class="ev-chip-icon">✏</span>${stu.short}・${e.subject}${dupHtml}</div>${timeHtml}`;
-        chip.onclick=ev2=>{ev2.stopPropagation();openModal(ds,dayS,dayK);};
+        const dupHtml = isDup && idx === 0 ? `<span class="dup-tag">2件</span>` : '';
+        const timeHtml = e.time ? `<div class="chip-time">⏰${e.time}</div>` : '';
+        chip.innerHTML = `<div class="ev-chip-row"><span class="ev-chip-icon">✏</span>${stu.short}・${e.subject}${dupHtml}</div>${timeHtml}`;
+        chip.onclick = ev2 => { ev2.stopPropagation(); openModal(ds, dayS, dayK); };
         ev.appendChild(chip);
       });
 
@@ -402,30 +401,30 @@ function renderCalendar(){
     calBody.appendChild(cell);
   }
 
-  const rem=(2+30)%7;
-  if(rem){for(let i=0;i<7-rem;i++){const el=document.createElement('div');el.className='cal-day empty';calBody.appendChild(el);}}
+  // 末尾の空白
+  const rem = (2 + 30) % 7;
+  if (rem) { for (let i = 0; i < 7 - rem; i++) { const el=document.createElement('div'); el.className='cal-day empty'; calBody.appendChild(el); } }
 }
 
 /* ─── 学生別一覧 ─── */
-function renderList(){
-  const lb=document.getElementById('listBody');lb.innerHTML='';
-  const list=activeStudent==='all'?STUDENTS:STUDENTS.filter(s=>s.id===activeStudent);
+function renderList() {
+  const lb = document.getElementById('listBody'); lb.innerHTML = '';
+  const list = activeStudent === 'all' ? STUDENTS : STUDENTS.filter(s => s.id === activeStudent);
 
-  list.forEach(stu=>{
-    const rows=RAW.filter(r=>r.sid===stu.id);
-    if(!rows.length) return;
+  list.forEach(stu => {
+    const rows = RAW.filter(r => r.sid === stu.id);
+    if (!rows.length) return;
 
-    // (subject,exam)でグループ化
-    const groups={};
-    rows.forEach(r=>{
-      const k=`${r.subject}||${r.exam}`;
-      if(!groups[k]) groups[k]={subject:r.subject,exam:r.exam,entries:[]};
-      groups[k].entries.push({day:r.day,time:r.time});
+    const groups = {};
+    rows.forEach(r => {
+      const k = `${r.subject}||${r.exam}`;
+      if (!groups[k]) groups[k] = {subject:r.subject, exam:r.exam, entries:[]};
+      groups[k].entries.push({day:r.day, time:r.time});
     });
-    const gl=Object.values(groups);
+    const gl = Object.values(groups);
 
-    const card=document.createElement('div');card.className='student-card';
-    card.innerHTML=`
+    const card = document.createElement('div'); card.className = 'student-card';
+    card.innerHTML = `
       <div class="student-card-header">
         <div class="student-avatar" style="background:${stu.color}">${stu.short[0]}</div>
         <div class="student-info">
@@ -437,33 +436,31 @@ function renderList(){
       <div class="subject-rows" id="rows-${stu.id}"></div>`;
     lb.appendChild(card);
 
-    const rowsEl=document.getElementById(`rows-${stu.id}`);
-    gl.forEach(g=>{
-      // 同日エントリをday→{count,time[]}にまとめる
-      const dayMap={};
-      g.entries.forEach(e=>{
-        if(!dayMap[e.day]) dayMap[e.day]={count:0,times:[]};
+    const rowsEl = document.getElementById(`rows-${stu.id}`);
+    gl.forEach(g => {
+      const dayMap = {};
+      g.entries.forEach(e => {
+        if (!dayMap[e.day]) dayMap[e.day] = {count:0, times:[]};
         dayMap[e.day].count++;
-        if(e.time) dayMap[e.day].times.push(e.time);
+        if (e.time) dayMap[e.day].times.push(e.time);
       });
-      const udays=Object.keys(dayMap).sort();
+      const udays = Object.keys(dayMap).sort();
 
-      const pills=udays.map(d=>{
-        const dm=dayMap[d];
-        const min=getDur(stu.id,d);
-        const mc=min>90?'#D97706':'#6B7280';
-        const dupBadge=dm.count>1?`<span style="background:#FEF3C7;color:#D97706;font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;margin-left:2px;">×${dm.count}</span>`:'';
-        // timeは重複があっても同じなので最初の1件だけ表示
-        const t=[...new Set(dm.times)][0]||'';
-        const timeEl=t?`<div class="pill-time">⏰ ${t}</div>`:'';
-        const durEl=`<div class="pill-dur" style="color:${mc}">⏱ ${durLabel(min)}</div>`;
+      const pills = udays.map(d => {
+        const dm = dayMap[d];
+        const min = getDur(stu.id, d);
+        const mc = min > 90 ? '#D97706' : '#6B7280';
+        const dupBadge = dm.count > 1 ? `<span style="background:#FEF3C7;color:#D97706;font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;margin-left:2px;">×${dm.count}</span>` : '';
+        const t = [...new Set(dm.times)][0] || '';
+        const timeEl = t ? `<div class="pill-time">⏰ ${t}</div>` : '';
+        const durEl  = `<div class="pill-dur" style="color:${mc}">⏱ ${durLabel(min)}</div>`;
         return `<span class="date-pill shugyo" style="border:1px solid ${stu.color}40;"><div class="pill-top">✏ ${fmtDate(d)}${dupBadge}</div>${timeEl}${durEl}</span>`;
       }).join('');
 
-      const examPill=`<span class="date-pill shiken" style="background:${stu.color}">🎯 ${fmtDate(g.exam)} 試験</span>`;
+      const examPill = `<span class="date-pill shiken" style="background:${stu.color};border-color:${stu.color};">🎯 ${fmtDate(g.exam)} 試験</span>`;
 
-      const row=document.createElement('div');row.className='subject-row';
-      row.innerHTML=`
+      const row = document.createElement('div'); row.className = 'subject-row';
+      row.innerHTML = `
         <div class="subject-name" style="color:${stu.color}">${g.subject}</div>
         <div class="schedule-row">${pills}<span class="arrow">→</span>${examPill}</div>`;
       rowsEl.appendChild(row);
@@ -472,47 +469,47 @@ function renderList(){
 }
 
 /* ─── モーダル ─── */
-function openModal(ds,shugyoList,shikenList){
-  document.getElementById('modalDate').textContent=`${fmtDate(ds).replace('(','\uff08').replace(')','\uff09')}のスケジュール`;
-  const body=document.getElementById('modalBody');body.innerHTML='';
+function openModal(ds, shugyoList, shikenList) {
+  document.getElementById('modalDate').textContent =
+    `${fmtDate(ds).replace('(', '\uff08').replace(')', '\uff09')}のスケジュール`;
+  const body = document.getElementById('modalBody'); body.innerHTML = '';
 
-  if(shikenList.length){
-    const g=document.createElement('div');g.className='modal-ev-group';
-    g.innerHTML=`<div class="modal-ev-type">🎯 試験</div>`;
-    shikenList.forEach(e=>{
-      const stu=SM[e.sid];
-      const item=document.createElement('div');item.className='modal-ev-item shiken';
-      item.style.cssText=`border-left-color:${stu.color};background:${stu.light};`;
-      item.innerHTML=`<div class="modal-ev-content"><div class="modal-ev-student">${stu.name}</div><div class="modal-ev-subject">${e.subject}</div></div><div class="modal-ev-badge" style="background:${stu.color}">試験</div>`;
+  if (shikenList.length) {
+    const g = document.createElement('div'); g.className = 'modal-ev-group';
+    g.innerHTML = `<div class="modal-ev-type">🎯 試験</div>`;
+    shikenList.forEach(e => {
+      const stu = SM[e.sid];
+      const item = document.createElement('div'); item.className = 'modal-ev-item shiken';
+      item.style.cssText = `border-left-color:${stu.color};background:${stu.light};`;
+      item.innerHTML = `<div class="modal-ev-content"><div class="modal-ev-student">${stu.name}</div><div class="modal-ev-subject">${e.subject}</div></div><div class="modal-ev-badge" style="background:${stu.color}">試験</div>`;
       g.appendChild(item);
     });
     body.appendChild(g);
   }
 
-  if(shugyoList.length){
-    const g=document.createElement('div');g.className='modal-ev-group';
-    g.innerHTML=`<div class="modal-ev-type">✏ 補習（課題提出）</div>`;
+  if (shugyoList.length) {
+    const g = document.createElement('div'); g.className = 'modal-ev-group';
+    g.innerHTML = `<div class="modal-ev-type">✏ 補習（課題提出）</div>`;
 
-    // sid+subjectごとに集約（count・time保持）
-    const agg={};
-    shugyoList.forEach(e=>{
-      const k=`${e.sid}_${e.subject}`;
-      if(!agg[k]) agg[k]={sid:e.sid,subject:e.subject,count:0,times:[]};
+    const agg = {};
+    shugyoList.forEach(e => {
+      const k = `${e.sid}_${e.subject}`;
+      if (!agg[k]) agg[k] = {sid:e.sid, subject:e.subject, count:0, times:[]};
       agg[k].count++;
-      if(e.time) agg[k].times.push(e.time);
+      if (e.time) agg[k].times.push(e.time);
     });
 
-    Object.values(agg).forEach(a=>{
-      const stu=SM[a.sid];
-      const min=getDur(a.sid,ds);
-      const mc=min>90?'#D97706':'#6B7280';
-      const dupNote=a.count>1?`<span class="dup-note">×${a.count}件（同科目）</span>`:'';
-      // 同一科目のtimeは同じ値なので最初の1件
-      const t=[...new Set(a.times)][0]||'';
-      const timeEl=t?`<div class="modal-ev-time">⏰ ${t}</div>`:'';
-      const item=document.createElement('div');item.className='modal-ev-item shugyo';
-      item.style.cssText=`border-left-color:${stu.color};background:${stu.light};`;
-      item.innerHTML=`
+    Object.values(agg).forEach(a => {
+      const stu = SM[a.sid];
+      const min = getDur(a.sid, ds);
+      const mc = min > 90 ? '#D97706' : '#6B7280';
+      const dupNote = a.count > 1 ? `<span class="dup-note">×${a.count}件（同科目）</span>` : '';
+      const t = [...new Set(a.times)][0] || '';
+      const timeEl = t ? `<div class="modal-ev-time">⏰ ${t}</div>` : '';
+
+      const item = document.createElement('div'); item.className = 'modal-ev-item shugyo';
+      item.style.cssText = `border-left-color:${stu.color};background:${stu.light};`;
+      item.innerHTML = `
         <div class="modal-ev-content">
           <div class="modal-ev-student">${stu.name}${dupNote}</div>
           <div class="modal-ev-subject">${a.subject}</div>
@@ -524,43 +521,43 @@ function openModal(ds,shugyoList,shikenList){
     });
     body.appendChild(g);
   }
-
   document.getElementById('modalOverlay').classList.add('open');
 }
-function closeModal(e){
-  if(e&&e.target!==document.getElementById('modalOverlay')) return;
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modalOverlay')) return;
   document.getElementById('modalOverlay').classList.remove('open');
 }
 
 /* ─── フィルター・ビュー切替 ─── */
-function buildFilters(){
-  const c=document.getElementById('studentFilters');c.innerHTML='';
-  const ab=document.createElement('button');
-  ab.className=`student-btn ${activeStudent==='all'?'active':''}`;
-  ab.style.borderColor=activeStudent==='all'?'#334155':'transparent';
-  ab.innerHTML=`<span class="dot" style="background:#334155"></span>全員`;
-  ab.onclick=()=>{activeStudent='all';refresh();};
+function buildFilters() {
+  const c = document.getElementById('studentFilters'); c.innerHTML = '';
+  const ab = document.createElement('button');
+  ab.className = `student-btn ${activeStudent === 'all' ? 'active' : ''}`;
+  ab.style.borderColor = activeStudent === 'all' ? '#334155' : 'transparent';
+  ab.innerHTML = `<span class="dot" style="background:#334155"></span>全員`;
+  ab.onclick = () => { activeStudent = 'all'; refresh(); };
   c.appendChild(ab);
-  STUDENTS.forEach(stu=>{
-    if(!RAW.some(r=>r.sid===stu.id)) return;
-    const btn=document.createElement('button');
-    btn.className=`student-btn ${activeStudent===stu.id?'active':''}`;
-    btn.style.borderColor=activeStudent===stu.id?stu.color:'transparent';
-    btn.innerHTML=`<span class="dot" style="background:${stu.color}"></span>${stu.name}`;
-    btn.onclick=()=>{activeStudent=stu.id;refresh();};
+  STUDENTS.forEach(stu => {
+    if (!RAW.some(r => r.sid === stu.id)) return;
+    const btn = document.createElement('button');
+    btn.className = `student-btn ${activeStudent === stu.id ? 'active' : ''}`;
+    btn.style.borderColor = activeStudent === stu.id ? stu.color : 'transparent';
+    btn.innerHTML = `<span class="dot" style="background:${stu.color}"></span>${stu.name}`;
+    btn.onclick = () => { activeStudent = stu.id; refresh(); };
     c.appendChild(btn);
   });
 }
-function setView(v){
-  currentView=v;
-  document.querySelectorAll('.view-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&v==='calendar')||(i===1&&v==='list')));
-  document.getElementById('calendarView').style.display=v==='calendar'?'block':'none';
-  document.getElementById('listView').style.display=v==='list'?'block':'none';
+function setView(v) {
+  currentView = v;
+  document.querySelectorAll('.view-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&v==='calendar')||(i===1&&v==='list')));
+  document.getElementById('calendarView').style.display = v === 'calendar' ? 'block' : 'none';
+  document.getElementById('listView').style.display    = v === 'list'     ? 'block' : 'none';
   render();
 }
-function refresh(){buildFilters();render();}
-function render(){currentView==='calendar'?renderCalendar():renderList();}
+function refresh() { buildFilters(); render(); }
+function render()  { currentView === 'calendar' ? renderCalendar() : renderList(); }
 
+/* ─── INIT ─── */
 buildFilters();
 renderCalendar();
 </script>
